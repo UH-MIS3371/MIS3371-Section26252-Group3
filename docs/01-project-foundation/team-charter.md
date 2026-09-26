@@ -1,6 +1,6 @@
 # DOCUMENT 07: Team charter
 
-* **Git / Integration Lead (Technical Anchor):** Mathew Budnik (Manages the GitHub repository, terminal operations, Claude Code prompts, core system architecture, and final code merges. Translates business rules into functional application logic).
+* **Git / Integration Lead (Technical Anchor):** Mathew Budnik (Manages the GitHub repository, terminal operations, core system architecture, and final code merges. Translates business rules into functional application logic).
 * **JavaScript / Logic Lead:** Sebastian Tamayo (Maps out business rules, validation steps, and logic flows. Will pair-program and collaborate directly with the Integration Lead to learn syntax and implement the client-side behavior).
 * **Requirements / Product Lead:** Manal Wadif (Manages project scope and user stories. Ensures the final product solves the defined business problem. Zero-coding role).
 * **UI / Accessibility Lead:** Kamaria Noble (Designs the interface layout, defines HTML structures, and ensures keyboard/accessibility compliance. Zero-coding role).
