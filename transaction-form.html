@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Return Request</title>
+</head>
+
+<body>
+
+  <header>
+    <h1>Product Return Request</h1>
+    <p>Submit a request to return an eligible item for a refund or replacement.</p>
+  </header>
+
+  <main>
+
+    <section>
+      <h2>Before You Begin</h2>
+      <p>
+        Please have your Customer ID, Order Number, Product SKU, and original
+        purchase or delivery date ready before completing this form.
+      </p>
+    </section>
+
+    <section>
+      <h2>Return Submission Form</h2>
+
+      <!--
+        method="get" is a placeholder for this milestone.
+        Real submission will go through JavaScript/API/backend logic later.
+      -->
+      <form method="get">
+
+        <fieldset>
+
+          <legend>Return Request Details</legend>
+
+          <!-- =====================================================
+               CUSTOMER ID
+               ===================================================== -->
+
+          <!-- for="customerId" must match id="customerId" -->
+          <label for="customerId">Customer ID</label>
+          <input
+            id="customerId"
+            name="customerId"
+            type="text"
+            required
+          >
+
+          <br><br>
+
+          <!-- =====================================================
+               ORDER NUMBER
+               ===================================================== -->
+
+          <label for="orderNumber">Order Number</label>
+
+          <input
+            id="orderNumber"
+            name="orderNumber"
+            type="text"
+            required
+          >
+
+          <br><br>
+
+          <!-- =====================================================
+               PRODUCT SKU
+               ===================================================== -->
+
+          <label for="sku">Product SKU</label>
+
+          <input
+            id="sku"
+            name="sku"
+            type="text"
+            required
+          >
+
+          <br><br>
+
+          <!-- =====================================================
+               QUANTITY TO RETURN
+               ===================================================== -->
+
+          <!--
+            Native constraints:
+            required = cannot be empty
+            min="1"  = must return at least one unit
+            step="1" = whole units only
+
+            BUSINESS RULE FOR LATER:
+            Quantity must not exceed what was originally purchased (BR-3).
+            HTML has no way to check that here; it needs the original
+            order's data, which comes later with JavaScript/backend logic.
+          -->
+          <label for="quantity">Quantity to Return</label>
+
+          <input
+            id="quantity"
+            name="quantity"
+            type="number"
+            required
+            min="1"
+            step="1"
+          >
+
+          <br><br>
+
+          <!-- =====================================================
+               REASON FOR RETURN
+               ===================================================== -->
+
+          <!--
+            <select> fits here because the business allows only a
+            known, fixed set of reasons.
+          -->
+          <label for="reasonCode">Reason for Return</label>
+
+          <select
+            id="reasonCode"
+            name="reasonCode"
+            required
+          >
+            <option value="">-- Select a reason --</option>
+            <option value="defective">Defective</option>
+            <option value="wrong_item">Wrong Item</option>
+            <option value="no_longer_needed">No Longer Needed</option>
+            <option value="other">Other</option>
+          </select>
+
+          <br><br>
+
+          <!-- =====================================================
+               PREFERRED RESOLUTION
+               ===================================================== -->
+
+          <label for="preferredResolution">Preferred Resolution</label>
+
+          <select
+            id="preferredResolution"
+            name="preferredResolution"
+            required
+          >
+            <option value="">-- Select a resolution --</option>
+            <option value="refund">Refund</option>
+            <option value="replacement">Replacement</option>
+          </select>
+
+          <br><br>
+
+          <!-- =====================================================
+               PURCHASE / DELIVERY DATE
+               ===================================================== -->
+
+          <!--
+            BUSINESS RULE FOR LATER:
+            Return must be within 30 days of this date (BR-1).
+            type="date" only guarantees a well-formed date; the 30-day
+            comparison is business logic, not native HTML validation.
+          -->
+          <label for="purchaseDate">Purchase / Delivery Date</label>
+
+          <input
+            id="purchaseDate"
+            name="purchaseDate"
+            type="date"
+            required
+          >
+
+          <br><br>
+
+          <!-- =====================================================
+               RETURN METHOD
+               ===================================================== -->
+
+          <label for="returnMethod">Return Method</label>
+
+          <select
+            id="returnMethod"
+            name="returnMethod"
+            required
+          >
+            <option value="">-- Select a return method --</option>
+            <option value="mail">Mail</option>
+            <option value="in_store">In-Store Drop-off</option>
+          </select>
+
+          <br><br>
+
+          <!-- =====================================================
+               REPLACEMENT SKU
+               ===================================================== -->
+
+          <!--
+            Not required: only meaningful when Preferred Resolution =
+            Replacement. Basic HTML can't express that conditional
+            requirement; JavaScript will handle it later.
+          -->
+          <label for="replacementSku">Replacement SKU (if requesting a replacement)</label>
+
+          <input
+            id="replacementSku"
+            name="replacementSku"
+            type="text"
+          >
+
+        </fieldset>
+
+        <br>
+
+        <button type="submit">
+          Submit Return Request
+        </button>
+
+      </form>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <p>MIS 3371 — Product Return Request System</p>
+  </footer>
+
+</body>
+</html>
