@@ -12,7 +12,7 @@
   * Sebastian Tamayo — s-tamayo
   * Manal Wadif — ManalWadif
   * Nicole Steffen — nicolesteffenUH
-  * Kamaria Noble — krnoble2 (invitation pending)
+  * Kamaria Noble — krnoble2 (accepted)
 * **TA Access:**
   * Sai Deeksha Ganthi (Section 26252 TA) — DeekshaGanthi (accepted)
 * **Instructor Access:**
