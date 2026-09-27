@@ -1,12 +1,18 @@
 :root {
-  --color-bg: #f5f6f8;
+  --color-bg: #f7f5f2;
   --color-surface: #ffffff;
-  --color-border: #c9ccd1;
-  --color-text: #1f2430;
-  --color-muted: #5b6270;
-  --color-primary: #1f4e8c;
-  --color-primary-dark: #163a68;
+  --color-border: #d8d3c8;
+  --color-text: #22261f;
+  --color-muted: #5c6355;
+  --color-primary: #1b4332;
+  --color-primary-dark: #12301f;
+  --color-accent: #c1502e;
+  --color-accent-dark: #9c3f22;
+  --color-dawn: #c97b52;
+  --color-sage: #3e6e57;
   --radius: 6px;
+  --font-heading: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "Source Sans 3", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {
@@ -15,13 +21,12 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.5;
 }
 
-header,
 main,
 footer {
   max-width: 640px;
@@ -31,16 +36,50 @@ footer {
 }
 
 header {
-  padding-top: 2rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-sage) 45%, var(--color-dawn) 100%);
+  padding-top: 2.5rem;
+  padding-bottom: 3.25rem;
+}
+
+.header-mountains {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  display: block;
+}
+
+.header-mountains--back polygon {
+  fill: var(--color-primary-dark);
+  opacity: 0.55;
+}
+
+.header-mountains--front polygon {
+  fill: #0b2216;
+  opacity: 0.8;
+}
+
+.header-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
 }
 
 header h1 {
-  font-size: 1.75rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.85rem;
+  color: #ffffff;
   margin-bottom: 0.25rem;
 }
 
 header p {
-  color: var(--color-muted);
+  color: #f3eade;
   margin-top: 0;
 }
 
@@ -53,6 +92,8 @@ main section {
 }
 
 main section h2 {
+  font-family: var(--font-heading);
+  font-weight: 600;
   font-size: 1.25rem;
   margin-top: 0;
 }
@@ -64,8 +105,10 @@ fieldset {
 }
 
 legend {
+  font-family: var(--font-heading);
   font-weight: 600;
   font-size: 1.05rem;
+  color: var(--color-primary);
   padding: 0;
   margin-bottom: 1rem;
 }
@@ -94,7 +137,7 @@ legend {
 
 .field input:focus-visible,
 .field select:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -110,8 +153,9 @@ legend {
 }
 
 button[type="submit"] {
-  font: inherit;
-  background: var(--color-primary);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  background: var(--color-accent);
   color: #ffffff;
   border: none;
   padding: 0.65rem 1.4rem;
@@ -120,11 +164,11 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background: var(--color-primary-dark);
+  background: var(--color-accent-dark);
 }
 
 button[type="submit"]:focus-visible {
-  outline: 2px solid var(--color-primary-dark);
+  outline: 2px solid var(--color-accent-dark);
   outline-offset: 2px;
 }
 
