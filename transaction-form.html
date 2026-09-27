@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
   <header>
@@ -26,7 +25,6 @@
   </header>
 
   <main>
-
     <section>
       <h2>Before You Begin</h2>
       <p>
@@ -38,126 +36,44 @@
     <section>
       <h2>Return Submission Form</h2>
 
-      <!--
-        method="get" is a placeholder for this milestone.
-        Real submission will go through JavaScript/API/backend logic later.
-      -->
+      <!-- TODO: Update action/method once backend/JS handler is ready -->
       <form method="get">
-
         <fieldset>
-
           <legend>Return Request Details</legend>
 
-          <!-- =====================================================
-               CUSTOMER ID
-               ===================================================== -->
-
-          <!-- for="customerId" must match id="customerId" -->
           <div class="field">
             <label for="customerId">Customer ID</label>
-            <input
-              id="customerId"
-              name="customerId"
-              type="text"
-              required
-            >
+            <input id="customerId" name="customerId" type="text" required>
           </div>
-
-          <!-- =====================================================
-               ORDER NUMBER
-               ===================================================== -->
 
           <div class="field">
             <label for="orderNumber">Order Number</label>
-            <input
-              id="orderNumber"
-              name="orderNumber"
-              type="text"
-              required
-            >
+            <input id="orderNumber" name="orderNumber" type="text" required>
           </div>
-
-          <!-- =====================================================
-               PRODUCT SKU
-               ===================================================== -->
 
           <div class="field">
             <label for="sku">Product SKU</label>
-            <input
-              id="sku"
-              name="sku"
-              type="text"
-              required
-            >
+            <input id="sku" name="sku" type="text" required>
           </div>
 
-          <!-- =====================================================
-               QUANTITY TO RETURN + PURCHASE/DELIVERY DATE
-               Paired in a row: both are short, single-value controls.
-               ===================================================== -->
-
           <div class="field-row">
-
-            <!--
-              Native constraints:
-              required = cannot be empty
-              min="1"  = must return at least one unit
-              step="1" = whole units only
-
-              BUSINESS RULE FOR LATER:
-              Quantity must not exceed what was originally purchased (BR-3).
-              HTML has no way to check that here; it needs the original
-              order's data, which comes later with JavaScript/backend logic.
-            -->
             <div class="field">
+              <!-- TODO (JS): Validate quantity <= original order quantity -->
               <label for="quantity">Quantity to Return</label>
-              <input
-                id="quantity"
-                name="quantity"
-                type="number"
-                required
-                min="1"
-                step="1"
-              >
+              <input id="quantity" name="quantity" type="number" min="1" step="1" required>
             </div>
 
-            <!--
-              BUSINESS RULE FOR LATER:
-              Return must be within 30 days of this date (BR-1).
-              type="date" only guarantees a well-formed date; the 30-day
-              comparison is business logic, not native HTML validation.
-            -->
             <div class="field">
+              <!-- TODO (JS): Validate date is within 30 days of purchase -->
               <label for="purchaseDate">Purchase / Delivery Date</label>
-              <input
-                id="purchaseDate"
-                name="purchaseDate"
-                type="date"
-                required
-              >
+              <input id="purchaseDate" name="purchaseDate" type="date" required>
             </div>
-
           </div>
 
-          <!-- =====================================================
-               REASON FOR RETURN + PREFERRED RESOLUTION
-               Paired in a row: both are short selects, and the resolution
-               choice naturally follows the reason.
-               ===================================================== -->
-
           <div class="field-row">
-
-            <!--
-              <select> fits here because the business allows only a
-              known, fixed set of reasons.
-            -->
             <div class="field">
               <label for="reasonCode">Reason for Return</label>
-              <select
-                id="reasonCode"
-                name="reasonCode"
-                required
-              >
+              <select id="reasonCode" name="reasonCode" required>
                 <option value="">-- Select a reason --</option>
                 <option value="Defective">Defective</option>
                 <option value="Wrong Item">Wrong Item</option>
@@ -168,69 +84,40 @@
 
             <div class="field">
               <label for="preferredResolution">Preferred Resolution</label>
-              <select
-                id="preferredResolution"
-                name="preferredResolution"
-                required
-              >
+              <select id="preferredResolution" name="preferredResolution" required>
                 <option value="">-- Select a resolution --</option>
                 <option value="Refund">Refund</option>
                 <option value="Replacement">Replacement</option>
               </select>
             </div>
-
           </div>
 
-          <!-- =====================================================
-               RETURN METHOD + REPLACEMENT SKU
-               Paired in a row: both are short controls.
-               ===================================================== -->
-
           <div class="field-row">
-
             <div class="field">
               <label for="returnMethod">Return Method</label>
-              <select
-                id="returnMethod"
-                name="returnMethod"
-                required
-              >
+              <select id="returnMethod" name="returnMethod" required>
                 <option value="">-- Select a return method --</option>
                 <option value="Mail">Mail</option>
                 <option value="In-Store Drop-off">In-Store Drop-off</option>
               </select>
             </div>
 
-            <!--
-              Not required: only meaningful when Preferred Resolution =
-              Replacement. Basic HTML can't express that conditional
-              requirement; JavaScript will handle it later.
-            -->
             <div class="field">
+              <!-- TODO (JS): Only require/show if preferredResolution === "Replacement" -->
               <label for="replacementSku">Replacement SKU (if requesting a replacement)</label>
-              <input
-                id="replacementSku"
-                name="replacementSku"
-                type="text"
-              >
+              <input id="replacementSku" name="replacementSku" type="text">
             </div>
-
           </div>
 
         </fieldset>
 
-        <button type="submit">
-          Submit Return Request
-        </button>
-
+        <button type="submit">Submit Return Request</button>
       </form>
-
     </section>
-
   </main>
 
   <footer>
-    <p>MIS 3371 — Product Return Request System</p>
+    <p>MIS 3371 - Product Return Request System</p>
   </footer>
 
 </body>
