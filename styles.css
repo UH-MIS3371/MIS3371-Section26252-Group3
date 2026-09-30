@@ -73,7 +73,7 @@ header {
 header h1 {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 1.85rem;
+  font-size: 2.15rem;
   color: #ffffff;
   margin-bottom: 0.25rem;
 }
@@ -81,6 +81,7 @@ header h1 {
 header p {
   color: #f3eade;
   margin-top: 0;
+  font-size: 1.00rem;
 }
 
 main section {
@@ -96,6 +97,20 @@ main section h2 {
   font-weight: 600;
   font-size: 1.25rem;
   margin-top: 0;
+  text-align: center;
+  padding-bottom: 0.4rem;
+  border-bottom: 3px solid var(--color-accent);
+}
+
+main section:first-of-type {
+  background: #fbf4e6;
+  border-color: #e6d3a8;
+  border-left: 4px solid #b7791f;
+}
+
+main section:first-of-type h2 {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 fieldset {
