@@ -141,6 +141,28 @@ legend {
   outline-offset: 2px;
 }
 
+.field-message {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.field-message:empty {
+  display: none;
+}
+
+.field-message--ok {
+  color: var(--color-primary);
+}
+
+.field-message--blocked {
+  color: var(--color-accent-dark);
+}
+
+#formMessage {
+  margin: 0 0 1rem;
+}
+
 .field-row {
   display: flex;
   flex-wrap: wrap;

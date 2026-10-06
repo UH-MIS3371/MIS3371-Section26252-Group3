@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
 
@@ -64,9 +65,9 @@
             </div>
 
             <div class="field">
-              <!-- TODO (JS): Validate date is within 30 days of purchase -->
               <label for="purchaseDate">Purchase / Delivery Date</label>
               <input id="purchaseDate" name="purchaseDate" type="date" required>
+              <p class="field-message" id="purchaseDateMessage" aria-live="polite"></p>
             </div>
           </div>
 
@@ -103,13 +104,15 @@
             </div>
 
             <div class="field">
-              <!-- TODO (JS): Only require/show if preferredResolution === "Replacement" -->
               <label for="replacementSku">Replacement SKU (if requesting a replacement)</label>
               <input id="replacementSku" name="replacementSku" type="text">
+              <p class="field-message" id="replacementSkuMessage" aria-live="polite"></p>
             </div>
           </div>
 
         </fieldset>
+
+        <p class="field-message" id="formMessage" aria-live="polite"></p>
 
         <button type="submit">Submit Return Request</button>
       </form>
