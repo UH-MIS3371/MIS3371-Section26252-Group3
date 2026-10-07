@@ -25,6 +25,8 @@ const replacementSkuMessage = document.getElementById("replacementSkuMessage");
 const purchaseDateInput = document.getElementById("purchaseDate");
 const purchaseDateMessage = document.getElementById("purchaseDateMessage");
 
+const quantityInput = document.getElementById("quantity");
+
 const form = document.querySelector("form");
 const formMessage = document.getElementById("formMessage");
 
@@ -98,6 +100,9 @@ function handleSubmit(event) {
     purchaseDateInput.focus();
     return;
   }
+
+  // Read quantity input as a Number before using it.
+  const quantity = Number(quantityInput.value);
 
   setMessage(formMessage, "Client-side checks passed.", "ok");
 }
