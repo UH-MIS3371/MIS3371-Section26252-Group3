@@ -57,12 +57,18 @@
             <input id="sku" name="sku" type="text" required>
           </div>
 
-          <div class="field-row">
-            <div class="field">
-              <!-- TODO (JS): Validate quantity <= original order quantity -->
-              <label for="quantity">Quantity to Return</label>
-              <input id="quantity" name="quantity" type="number" min="1" step="1" required>
-            </div>
+         <div class="field">
+          <label for="originalQuantity">Original Quantity Purchased</label>
+          <input id="originalQuantity" name="originalQuantity"
+           type="number" min="1" step="1" required>
+
+          <label for="quantity">Quantity to Return</label>
+          <input id="quantity" name="quantity"
+         type="number" min="1" step="1" required>
+
+            <p class="field-message" id="quantityMessage"
+           aria-live="polite"></p>
+        </div>
 
             <div class="field">
               <label for="purchaseDate">Purchase / Delivery Date</label>
