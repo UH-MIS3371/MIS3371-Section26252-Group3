@@ -16,37 +16,51 @@ function daysSincePurchase(purchaseDate, today) {
 // Rule 1: Return must be requested within 30 days of the purchase date.
 // Returns true if the request is inside the window, false if not.
 function isWithinReturnWindow(purchaseDate, today) {
-  // TODO: use daysSincePurchase() and RETURN_WINDOW_DAYS
-  return false;
+  return daysSincePurchase(purchaseDate, today) <= RETURN_WINDOW_DAYS;
 }
 
 // Rule 2: Quantity to return must be at least 1 and cannot be
 // more than the original quantity purchased.
 // Returns true if the quantity is allowed, false if not.
 function isQuantityValid(quantity, originalQuantity) {
-  // TODO: check quantity >= 1 and quantity <= originalQuantity
-  return false;
+  return quantity >= 1 && quantity <= originalQuantity;
 }
 
 // Rule 3: Defective items worth more than $200 must be sent to a supervisor.
 // Returns true if a supervisor must approve, false if not.
 // Note: exactly $200 does NOT need approval (only over $200).
 function needsSupervisorApproval(reasonCode, itemTotal) {
-  // TODO: check reasonCode is "Defective" and itemTotal > SUPERVISOR_APPROVAL_LIMIT
-  return false;
+  return reasonCode === "Defective" && itemTotal > SUPERVISOR_APPROVAL_LIMIT;
 }
 
 // Main function: puts the rules together and returns one result object.
 // request = { purchaseDate, quantity, originalQuantity, reasonCode, itemTotal }
 // result  = { approved: true/false, needsSupervisor: true/false, message }
 function processReturnRequest(request, today) {
-  // TODO: check Rule 1, then Rule 2, then Rule 3
-  // - If Rule 1 or Rule 2 fails, approved is false and message says why
-  // - If Rule 3 applies, approved is true and needsSupervisor is true
+  if (!isWithinReturnWindow(request.purchaseDate, today)) {
+    return {
+      approved: false,
+      needsSupervisor: false,
+      message: "Return request is outside the 30-day return window."
+    };
+  }
+
+  if (!isQuantityValid(request.quantity, request.originalQuantity)) {
+    return {
+      approved: false,
+      needsSupervisor: false,
+      message: "Return quantity exceeds the original quantity purchased."
+    };
+  }
+
+  var needsSupervisor = needsSupervisorApproval(request.reasonCode, request.itemTotal);
+
   return {
-    approved: false,
-    needsSupervisor: false,
-    message: "Not implemented yet"
+    approved: true,
+    needsSupervisor: needsSupervisor,
+    message: needsSupervisor
+      ? "Approved, pending supervisor review (defective item over $200)."
+      : "Approved."
   };
 }
 

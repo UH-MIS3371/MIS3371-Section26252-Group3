@@ -13,13 +13,17 @@ All tests use today's date = 2026-10-18.
 
 | # | Type | Input (summary) | Expected | Actual | Pass/Fail |
 |---|------|-----------------|----------|--------|-----------|
-| 1 | Valid | 10 days old, return 1 of 2, "No Longer Needed", $50 | Approved, no supervisor | _fill in after running_ | |
-| 2 | Valid | 17 days old, return 1 of 1, "Defective", $250 | Approved, supervisor needed | _fill in after running_ | |
-| 3 | Invalid | 45 days old, return 1 of 1, "Wrong Item", $40 | Rejected (outside 30 days) | _fill in after running_ | |
-| 4 | Invalid | 8 days old, return 3 of 2, "Other", $60 | Rejected (quantity too high) | _fill in after running_ | |
-| 5 | Boundary | exactly 30 days old, return 1 of 1, $75 | Approved, no supervisor | _fill in after running_ | |
-| 6 | Boundary | 3 days old, return 1 of 1, "Defective", exactly $200 | Approved, no supervisor | _fill in after running_ | |
+| 1 | Valid | 10 days old, return 1 of 2, "No Longer Needed", $50 | Approved, no supervisor | Approved, no supervisor | PASS |
+| 2 | Valid | 17 days old, return 1 of 1, "Defective", $250 | Approved, supervisor needed | Approved, supervisor needed | PASS |
+| 3 | Invalid | 45 days old, return 1 of 1, "Wrong Item", $40 | Rejected (outside 30 days) | Rejected (outside 30 days) | PASS |
+| 4 | Invalid | 8 days old, return 3 of 2, "Other", $60 | Rejected (quantity too high) | Rejected (quantity too high) | PASS |
+| 5 | Boundary | exactly 30 days old, return 1 of 1, $75 | Approved, no supervisor | Approved, no supervisor | PASS |
+| 6 | Boundary | 3 days old, return 1 of 1, "Defective", exactly $200 | Approved, no supervisor | Approved, no supervisor | PASS |
+
+6 of 6 tests passed. Run with `node returnRules.test.js` from the `backend` folder to reproduce.
 
 ## Notes
 
-- `returnRules.js` currently has TODO placeholders, so the four tests that expect approval will FAIL until the rules are implemented. Tests 3 and 4 expect a rejection, so they pass by accident with the placeholder code - they only count once the real rules are written.
+- All three rules (30-day window, quantity vs. original purchased, defective-over-$200 supervisor routing) are implemented in `returnRules.js`.
+- Test 5 confirms the 30-day boundary is inclusive (exactly 30 days still approves).
+- Test 6 confirms the $200 boundary is exclusive (exactly $200 does not require supervisor approval — only strictly over $200 does).
