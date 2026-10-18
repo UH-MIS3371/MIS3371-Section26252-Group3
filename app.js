@@ -18,6 +18,11 @@ function isWithinReturnWindow(purchaseDateValue) {
   return daysSincePurchase(purchaseDateValue) <= RETURN_WINDOW_DAYS;
 }
 
+// BR-3: return quantity can't exceed what was originally purchased
+function isQuantityValid(quantity, originalQuantity) {
+  return quantity >= 1 && quantity <= originalQuantity;
+}
+
 const preferredResolutionSelect = document.getElementById("preferredResolution");
 const replacementSkuInput = document.getElementById("replacementSku");
 const replacementSkuMessage = document.getElementById("replacementSkuMessage");
@@ -25,7 +30,9 @@ const replacementSkuMessage = document.getElementById("replacementSkuMessage");
 const purchaseDateInput = document.getElementById("purchaseDate");
 const purchaseDateMessage = document.getElementById("purchaseDateMessage");
 
+const originalQuantityInput = document.getElementById("originalQuantity");
 const quantityInput = document.getElementById("quantity");
+const quantityMessage = document.getElementById("quantityMessage");
 
 const form = document.querySelector("form");
 const formMessage = document.getElementById("formMessage");
@@ -45,6 +52,7 @@ function updateReplacementSkuState() {
 
   if (!required) {
     setMessage(replacementSkuMessage, "");
+    replacementSkuInput.removeAttribute("aria-invalid");
     return;
   }
 
@@ -52,6 +60,7 @@ function updateReplacementSkuState() {
     setMessage(replacementSkuMessage, "Replacement SKU is required when requesting a replacement.", "blocked");
   } else {
     setMessage(replacementSkuMessage, "Replacement SKU provided.", "ok");
+    replacementSkuInput.removeAttribute("aria-invalid");
   }
 }
 
@@ -78,12 +87,36 @@ function updatePurchaseDateMessage() {
       daysLeft + (daysLeft === 1 ? " day" : " days") + " left to return this item.",
       "ok"
     );
+    purchaseDateInput.removeAttribute("aria-invalid");
+  }
+}
+
+function updateQuantityMessage() {
+  const quantityValue = quantityInput.value;
+  const originalValue = originalQuantityInput.value;
+
+  if (!quantityValue || !originalValue) {
+    setMessage(quantityMessage, "");
+    quantityInput.removeAttribute("aria-invalid");
+    return;
+  }
+
+  const quantity = Number(quantityValue);
+  const originalQuantity = Number(originalValue);
+
+  if (isQuantityValid(quantity, originalQuantity)) {
+    setMessage(quantityMessage, "Quantity is valid.", "ok");
+    quantityInput.removeAttribute("aria-invalid");
+  } else {
+    setMessage(quantityMessage, "Quantity to return cannot exceed the original quantity purchased (BR-3).", "blocked");
   }
 }
 
 preferredResolutionSelect.addEventListener("change", updateReplacementSkuState);
 replacementSkuInput.addEventListener("input", updateReplacementSkuState);
 purchaseDateInput.addEventListener("input", updatePurchaseDateMessage);
+originalQuantityInput.addEventListener("input", updateQuantityMessage);
+quantityInput.addEventListener("input", updateQuantityMessage);
 
 // submit-time gate (Week 7): re-check both rules before letting the browser path continue
 function handleSubmit(event) {
@@ -91,18 +124,29 @@ function handleSubmit(event) {
 
   if (isReplacementSkuRequired(preferredResolutionSelect.value) && replacementSkuInput.value.trim() === "") {
     setMessage(formMessage, "Enter a Replacement SKU before submitting, or change your Preferred Resolution.", "blocked");
+    // Give invalid fields a visible error outline that doesn't depend on
+    // :focus-visible's mouse-vs-keyboard heuristic (A13, accessibility review).
+    replacementSkuInput.setAttribute("aria-invalid", "true");
     replacementSkuInput.focus();
     return;
   }
 
   if (!isWithinReturnWindow(purchaseDateInput.value)) {
     setMessage(formMessage, "This return is outside the 30-day window and cannot be submitted (BR-1).", "blocked");
+    purchaseDateInput.setAttribute("aria-invalid", "true");
     purchaseDateInput.focus();
     return;
   }
 
-  // Read quantity input as a Number before using it.
   const quantity = Number(quantityInput.value);
+  const originalQuantity = Number(originalQuantityInput.value);
+
+  if (!isQuantityValid(quantity, originalQuantity)) {
+    setMessage(formMessage, "Quantity to return cannot exceed the original quantity purchased (BR-3).", "blocked");
+    quantityInput.setAttribute("aria-invalid", "true");
+    quantityInput.focus();
+    return;
+  }
 
   setMessage(formMessage, "Client-side checks passed.", "ok");
 }
