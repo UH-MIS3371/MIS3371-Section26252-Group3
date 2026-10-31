@@ -1,0 +1,9 @@
+{
+  "version": "2.0",
+  "requestContext": {
+    "http": {
+      "method": "POST"
+    }
+  },
+  "body": "{\"purchaseDate\":\"2026-10-21\",\"quantity\":1,\"originalQuantity\":2,\"reasonCode\":\"No Longer Needed\",\"itemTotal\":50}"
+}

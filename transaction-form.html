@@ -37,10 +37,18 @@
     <section>
       <h2>Return Submission Form</h2>
 
-      <!-- TODO: Update action/method once backend/JS handler is ready -->
-      <form method="get">
-        <fieldset>
-          <legend>Return Request Details</legend>
+      <form method="post">
+        <fieldset class="form-section">
+          <legend class="section-legend">
+            <span class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 8l9-5 9 5-9 5-9-5z"/>
+                <path d="M3 8v8l9 5 9-5V8"/>
+                <path d="M12 13v8"/>
+              </svg>
+            </span>
+            Order Details
+          </legend>
 
           <div class="field">
             <label for="customerId">Customer ID</label>
@@ -56,6 +64,18 @@
             <label for="sku">Product SKU</label>
             <input id="sku" name="sku" type="text" required>
           </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend class="section-legend">
+            <span class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="16" rx="2"/>
+                <path d="M16 3v4M8 3v4M3 10h18"/>
+              </svg>
+            </span>
+            Return Details
+          </legend>
 
           <div class="field-row">
             <div class="field">
@@ -76,7 +96,7 @@
             <p class="field-message" id="purchaseDateMessage" aria-live="polite"></p>
           </div>
 
-            <div class="field-row">
+          <div class="field-row">
             <div class="field">
               <label for="itemTotal">Item Price ($)</label>
               <input id="itemTotal" name="itemTotal" type="number" min="0.01" step="0.01" required aria-describedby="itemTotalMessage">
@@ -93,6 +113,18 @@
               <p class="field-message" id="finalSaleMessage" aria-live="polite"></p>
             </div>
           </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend class="section-legend">
+            <span class="section-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M15 9l-3.5 1.5L10 14l3.5-1.5L15 9z"/>
+              </svg>
+            </span>
+            Resolution
+          </legend>
 
           <div class="field-row">
             <div class="field">
@@ -132,12 +164,20 @@
               <p class="field-message" id="replacementSkuMessage" aria-live="polite"></p>
             </div>
           </div>
-
         </fieldset>
 
-        <p class="field-message" id="formMessage" aria-live="polite"></p>
+        <div class="result-panel" id="formMessage" aria-live="polite" hidden>
+          <span class="result-icon" id="resultIcon"></span>
+          <div>
+            <p class="result-heading" id="resultHeading"></p>
+            <p class="result-detail" id="resultDetail"></p>
+          </div>
+        </div>
 
-        <button type="submit">Submit Return Request</button>
+        <button type="submit" id="submitButton">
+          <span id="submitButtonLabel">Submit Return Request</span>
+          <span class="button-spinner" id="submitSpinner" aria-hidden="true" hidden></span>
+        </button>
       </form>
     </section>
   </main>

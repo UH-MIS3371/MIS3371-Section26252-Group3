@@ -10,9 +10,35 @@
   --color-accent-dark: #9c3f22;
   --color-dawn: #c97b52;
   --color-sage: #3e6e57;
+  --color-success-bg: #e8f3ec;
+  --color-pending-bg: #faeee3;
+  --color-reject-bg: #fbeae5;
   --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-card: 0 1px 2px rgba(18, 48, 31, 0.06), 0 4px 14px rgba(18, 48, 31, 0.05);
   --font-heading: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: "Source Sans 3", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Dark mode redefines the same tokens; every rule below keeps using them unchanged. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #141a15;
+    --color-surface: #1c2420;
+    --color-border: #32392f;
+    --color-text: #eceae4;
+    --color-muted: #a3ab9b;
+    --color-primary: #5fae87;
+    --color-primary-dark: #3e6e57;
+    --color-accent: #e08257;
+    --color-accent-dark: #f0a07a;
+    --color-dawn: #d99068;
+    --color-sage: #6fa184;
+    --color-success-bg: #1d2e24;
+    --color-pending-bg: #2e2419;
+    --color-reject-bg: #2e1d1a;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.25);
+  }
 }
 
 * {
@@ -25,11 +51,12 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.5;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 main,
 footer {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
   padding-left: 1.25rem;
   padding-right: 1.25rem;
@@ -65,7 +92,7 @@ header {
 .header-inner {
   position: relative;
   z-index: 1;
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 0 1.25rem;
 }
@@ -86,9 +113,11 @@ header p {
 main section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   padding: 1.25rem 1.5rem;
   margin: 1.5rem 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.2s ease;
 }
 
 main section h2 {
@@ -98,19 +127,47 @@ main section h2 {
   margin-top: 0;
 }
 
-fieldset {
+/* Form sections: each business-data group gets its own fieldset, card and icon. */
+.form-section {
   border: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 1.75rem;
 }
 
-legend {
+.form-section:last-of-type {
+  margin-bottom: 0;
+}
+
+/* display:flex on <legend> itself is unreliable across browsers (legend
+   has its own special layout algorithm), so the icon+text pairing uses
+   plain inline-block/vertical-align instead of a flex container here. */
+.section-legend {
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 1.05rem;
   color: var(--color-primary);
   padding: 0;
   margin-bottom: 1rem;
+}
+
+.section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  color: var(--color-primary);
+  vertical-align: middle;
+  transition: background-color 0.25s ease;
+}
+
+.section-icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  display: block;
 }
 
 .field {
@@ -133,12 +190,19 @@ legend {
   font: inherit;
   color: inherit;
   background: var(--color-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.25s ease;
+}
+
+.field input:hover,
+.field select:hover {
+  border-color: var(--color-sage);
 }
 
 .field input:focus-visible,
 .field select:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(193, 80, 46, 0.18);
 }
 
 /* Accessibility review (A13): :focus-visible doesn't show a ring when
@@ -169,10 +233,6 @@ legend {
   color: var(--color-accent-dark);
 }
 
-#formMessage {
-  margin: 0 0 1rem;
-}
-
 .field-row {
   display: flex;
   flex-wrap: wrap;
@@ -184,7 +244,114 @@ legend {
   margin-bottom: 1.1rem;
 }
 
+/* Result panel: the single big moment after submit. Four states share one
+   shape (icon + heading + detail) so approvals, rejections and the
+   in-flight request all read as part of the same system. */
+.result-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1.1rem;
+  margin: 0 0 1.25rem;
+  background: var(--color-bg);
+  animation: result-in 0.25s ease;
+}
+
+.result-panel[hidden] {
+  display: none;
+}
+
+@keyframes result-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-icon {
+  flex: none;
+  display: inline-flex;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.1rem;
+}
+
+.result-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.result-heading {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  margin: 0;
+}
+
+.result-detail {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.result-detail:empty {
+  display: none;
+}
+
+.result-panel--approved {
+  background: var(--color-success-bg);
+  border-color: var(--color-primary);
+}
+
+.result-panel--approved .result-icon,
+.result-panel--approved .result-heading {
+  color: var(--color-primary);
+}
+
+.result-panel--supervisor {
+  background: var(--color-pending-bg);
+  border-color: var(--color-dawn);
+}
+
+.result-panel--supervisor .result-icon,
+.result-panel--supervisor .result-heading {
+  color: var(--color-dawn);
+}
+
+.result-panel--rejected {
+  background: var(--color-reject-bg);
+  border-color: var(--color-accent-dark);
+}
+
+.result-panel--rejected .result-icon,
+.result-panel--rejected .result-heading {
+  color: var(--color-accent-dark);
+}
+
+.result-panel--loading .result-icon,
+.result-panel--loading .result-heading {
+  color: var(--color-muted);
+}
+
+.result-panel--loading .result-icon svg {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   font-family: var(--font-heading);
   font-weight: 600;
   background: var(--color-accent);
@@ -193,15 +360,38 @@ button[type="submit"] {
   padding: 0.65rem 1.4rem;
   border-radius: var(--radius);
   cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.08s ease;
 }
 
 button[type="submit"]:hover {
   background: var(--color-accent-dark);
 }
 
+button[type="submit"]:active {
+  transform: scale(0.98);
+}
+
 button[type="submit"]:focus-visible {
   outline: 2px solid var(--color-accent-dark);
   outline-offset: 2px;
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+.button-spinner {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #ffffff;
+  animation: spin 0.7s linear infinite;
+}
+
+.button-spinner[hidden] {
+  display: none;
 }
 
 footer {
@@ -222,5 +412,14 @@ footer {
   .field input,
   .field select {
     max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
   }
 }

@@ -1,6 +1,9 @@
 // BR-1: return must be within 30 days of purchase/delivery
 const RETURN_WINDOW_DAYS = 30;
 
+// Week 10: HTTP API created in API Gateway, routed to the MIS3371-ReturnRequest Lambda.
+const API_URL = "https://iqpj8rd7ff.execute-api.us-east-1.amazonaws.com/api/returns";
+
 function isReplacementSkuRequired(preferredResolution) {
   return preferredResolution === "Replacement";
 }
@@ -34,8 +37,18 @@ const originalQuantityInput = document.getElementById("originalQuantity");
 const quantityInput = document.getElementById("quantity");
 const quantityMessage = document.getElementById("quantityMessage");
 
+const itemTotalInput = document.getElementById("itemTotal");
+const reasonCodeSelect = document.getElementById("reasonCode");
+
 const form = document.querySelector("form");
 const formMessage = document.getElementById("formMessage");
+const resultIcon = document.getElementById("resultIcon");
+const resultHeading = document.getElementById("resultHeading");
+const resultDetail = document.getElementById("resultDetail");
+
+const submitButton = document.getElementById("submitButton");
+const submitButtonLabel = document.getElementById("submitButtonLabel");
+const submitSpinner = document.getElementById("submitSpinner");
 
 function setMessage(element, text, state) {
   element.textContent = text;
@@ -43,6 +56,34 @@ function setMessage(element, text, state) {
   if (state) {
     element.classList.add("field-message--" + state);
   }
+}
+
+// result-panel icons, one per outcome state (RETURN_WINDOW_DAYS etc. stay pure data above)
+const RESULT_ICONS = {
+  approved: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9"/></svg>',
+  supervisor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  rejected: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>',
+  loading: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.3"/><path d="M21 12a9 9 0 0 0-9-9"/></svg>'
+};
+
+// Single entry point for the post-submit result panel. state is one of
+// RESULT_ICONS' keys, or null to hide the panel entirely.
+function setResultPanel(state, heading, detail) {
+  if (!state) {
+    formMessage.hidden = true;
+    return;
+  }
+  formMessage.hidden = false;
+  formMessage.className = "result-panel result-panel--" + state;
+  resultIcon.innerHTML = RESULT_ICONS[state];
+  resultHeading.textContent = heading;
+  resultDetail.textContent = detail || "";
+}
+
+function setSubmitting(isSubmitting) {
+  submitButton.disabled = isSubmitting;
+  submitButtonLabel.textContent = isSubmitting ? "Submitting…" : "Submit Return Request";
+  submitSpinner.hidden = !isSubmitting;
 }
 
 // live feedback while the user edits the form (Week 6)
@@ -119,11 +160,11 @@ originalQuantityInput.addEventListener("input", updateQuantityMessage);
 quantityInput.addEventListener("input", updateQuantityMessage);
 
 // submit-time gate (Week 7): re-check both rules before letting the browser path continue
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
 
   if (isReplacementSkuRequired(preferredResolutionSelect.value) && replacementSkuInput.value.trim() === "") {
-    setMessage(formMessage, "Enter a Replacement SKU before submitting, or change your Preferred Resolution.", "blocked");
+    setResultPanel("rejected", "Can't submit yet", "Enter a Replacement SKU before submitting, or change your Preferred Resolution.");
     // Give invalid fields a visible error outline that doesn't depend on
     // :focus-visible's mouse-vs-keyboard heuristic (A13, accessibility review).
     replacementSkuInput.setAttribute("aria-invalid", "true");
@@ -132,7 +173,7 @@ function handleSubmit(event) {
   }
 
   if (!isWithinReturnWindow(purchaseDateInput.value)) {
-    setMessage(formMessage, "This return is outside the 30-day window and cannot be submitted (BR-1).", "blocked");
+    setResultPanel("rejected", "Can't submit yet", "This return is outside the 30-day window and cannot be submitted (BR-1).");
     purchaseDateInput.setAttribute("aria-invalid", "true");
     purchaseDateInput.focus();
     return;
@@ -142,13 +183,43 @@ function handleSubmit(event) {
   const originalQuantity = Number(originalQuantityInput.value);
 
   if (!isQuantityValid(quantity, originalQuantity)) {
-    setMessage(formMessage, "Quantity to return cannot exceed the original quantity purchased (BR-3).", "blocked");
+    setResultPanel("rejected", "Can't submit yet", "Quantity to return cannot exceed the original quantity purchased (BR-3).");
     quantityInput.setAttribute("aria-invalid", "true");
     quantityInput.focus();
     return;
   }
 
-  setMessage(formMessage, "Client-side checks passed.", "ok");
+  setSubmitting(true);
+  setResultPanel("loading", "Submitting your request…", "");
+
+  const requestBody = {
+    purchaseDate: purchaseDateInput.value,
+    quantity: quantity,
+    originalQuantity: originalQuantity,
+    reasonCode: reasonCodeSelect.value,
+    itemTotal: Number(itemTotalInput.value)
+  };
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+    const result = await response.json();
+
+    if (!result.approved) {
+      setResultPanel("rejected", "Not approved", result.message);
+    } else if (result.needsSupervisor) {
+      setResultPanel("supervisor", "Approved — pending supervisor review", result.message);
+    } else {
+      setResultPanel("approved", "Approved", "");
+    }
+  } catch (error) {
+    setResultPanel("rejected", "Couldn't reach the server", "Check your connection and try again.");
+  } finally {
+    setSubmitting(false);
+  }
 }
 
 form.addEventListener("submit", handleSubmit);
