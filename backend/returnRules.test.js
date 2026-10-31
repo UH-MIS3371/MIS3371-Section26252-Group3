@@ -85,6 +85,20 @@ var tests = [
     },
     expectedApproved: true,
     expectedSupervisor: false
+  },
+  {
+    name: "Test 7 - Invalid: final-sale item is not returnable (BR-2)",
+    type: "Invalid",
+    request: {
+      purchaseDate: "2026-10-10",
+      quantity: 1,
+      originalQuantity: 1,
+      reasonCode: "No Longer Needed",
+      itemTotal: 30,
+      finalSale: "Yes"
+    },
+    expectedApproved: false,
+    expectedSupervisor: false
   }
 ];
 

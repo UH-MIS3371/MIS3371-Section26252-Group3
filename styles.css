@@ -209,7 +209,8 @@ main section h2 {
    JS moves focus after a mouse-click submit, so a mouse user who gets
    blocked sees no cue where to look. This outline is driven by
    aria-invalid instead, which isn't subject to that heuristic. */
-.field input[aria-invalid="true"] {
+.field input[aria-invalid="true"],
+.field select[aria-invalid="true"] {
   border-color: var(--color-accent-dark);
   outline: 2px solid var(--color-accent-dark);
   outline-offset: 2px;

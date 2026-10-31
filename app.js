@@ -21,6 +21,12 @@ function isWithinReturnWindow(purchaseDateValue) {
   return daysSincePurchase(purchaseDateValue) <= RETURN_WINDOW_DAYS;
 }
 
+// BR-2: final-sale/clearance items are not eligible for return
+function isFinalSaleReturnable(finalSale) {
+  if (!finalSale) return true; // nothing selected yet, don't block on an empty field
+  return finalSale !== "Yes";
+}
+
 // BR-3: return quantity can't exceed what was originally purchased
 function isQuantityValid(quantity, originalQuantity) {
   return quantity >= 1 && quantity <= originalQuantity;
@@ -39,6 +45,9 @@ const quantityMessage = document.getElementById("quantityMessage");
 
 const itemTotalInput = document.getElementById("itemTotal");
 const reasonCodeSelect = document.getElementById("reasonCode");
+
+const finalSaleSelect = document.getElementById("finalSale");
+const finalSaleMessage = document.getElementById("finalSaleMessage");
 
 const form = document.querySelector("form");
 const formMessage = document.getElementById("formMessage");
@@ -153,11 +162,29 @@ function updateQuantityMessage() {
   }
 }
 
+function updateFinalSaleMessage() {
+  const value = finalSaleSelect.value;
+
+  if (!value) {
+    setMessage(finalSaleMessage, "");
+    finalSaleSelect.removeAttribute("aria-invalid");
+    return;
+  }
+
+  if (!isFinalSaleReturnable(value)) {
+    setMessage(finalSaleMessage, "Final-sale and clearance items cannot be returned (BR-2).", "blocked");
+  } else {
+    setMessage(finalSaleMessage, "");
+    finalSaleSelect.removeAttribute("aria-invalid");
+  }
+}
+
 preferredResolutionSelect.addEventListener("change", updateReplacementSkuState);
 replacementSkuInput.addEventListener("input", updateReplacementSkuState);
 purchaseDateInput.addEventListener("input", updatePurchaseDateMessage);
 originalQuantityInput.addEventListener("input", updateQuantityMessage);
 quantityInput.addEventListener("input", updateQuantityMessage);
+finalSaleSelect.addEventListener("change", updateFinalSaleMessage);
 
 // submit-time gate (Week 7): re-check both rules before letting the browser path continue
 async function handleSubmit(event) {
@@ -179,6 +206,13 @@ async function handleSubmit(event) {
     return;
   }
 
+  if (!isFinalSaleReturnable(finalSaleSelect.value)) {
+    setResultPanel("rejected", "Can't submit yet", "Final-sale and clearance items are not eligible for return (BR-2).");
+    finalSaleSelect.setAttribute("aria-invalid", "true");
+    finalSaleSelect.focus();
+    return;
+  }
+
   const quantity = Number(quantityInput.value);
   const originalQuantity = Number(originalQuantityInput.value);
 
@@ -197,7 +231,8 @@ async function handleSubmit(event) {
     quantity: quantity,
     originalQuantity: originalQuantity,
     reasonCode: reasonCodeSelect.value,
-    itemTotal: Number(itemTotalInput.value)
+    itemTotal: Number(itemTotalInput.value),
+    finalSale: finalSaleSelect.value
   };
 
   try {
