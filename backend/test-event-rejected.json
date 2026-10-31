@@ -1,0 +1,9 @@
+{
+  "version": "2.0",
+  "requestContext": {
+    "http": {
+      "method": "POST"
+    }
+  },
+  "body": "{\"purchaseDate\":\"2026-09-16\",\"quantity\":1,\"originalQuantity\":1,\"reasonCode\":\"Wrong Item\",\"itemTotal\":40}"
+}

@@ -1,6 +1,9 @@
 // BR-1: return must be within 30 days of purchase/delivery
 const RETURN_WINDOW_DAYS = 30;
 
+// Week 10: HTTP API created in API Gateway, routed to the MIS3371-ReturnRequest Lambda.
+const API_URL = "https://iqpj8rd7ff.execute-api.us-east-1.amazonaws.com/api/returns";
+
 function isReplacementSkuRequired(preferredResolution) {
   return preferredResolution === "Replacement";
 }
@@ -33,6 +36,9 @@ const purchaseDateMessage = document.getElementById("purchaseDateMessage");
 const originalQuantityInput = document.getElementById("originalQuantity");
 const quantityInput = document.getElementById("quantity");
 const quantityMessage = document.getElementById("quantityMessage");
+
+const itemTotalInput = document.getElementById("itemTotal");
+const reasonCodeSelect = document.getElementById("reasonCode");
 
 const form = document.querySelector("form");
 const formMessage = document.getElementById("formMessage");
@@ -119,7 +125,7 @@ originalQuantityInput.addEventListener("input", updateQuantityMessage);
 quantityInput.addEventListener("input", updateQuantityMessage);
 
 // submit-time gate (Week 7): re-check both rules before letting the browser path continue
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
 
   if (isReplacementSkuRequired(preferredResolutionSelect.value) && replacementSkuInput.value.trim() === "") {
@@ -148,7 +154,27 @@ function handleSubmit(event) {
     return;
   }
 
-  setMessage(formMessage, "Client-side checks passed.", "ok");
+  setMessage(formMessage, "Submitting...", "");
+
+  const requestBody = {
+    purchaseDate: purchaseDateInput.value,
+    quantity: quantity,
+    originalQuantity: originalQuantity,
+    reasonCode: reasonCodeSelect.value,
+    itemTotal: Number(itemTotalInput.value)
+  };
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+    const result = await response.json();
+    setMessage(formMessage, result.message, result.approved ? "ok" : "blocked");
+  } catch (error) {
+    setMessage(formMessage, "Could not reach the server. Check your connection and try again.", "blocked");
+  }
 }
 
 form.addEventListener("submit", handleSubmit);
