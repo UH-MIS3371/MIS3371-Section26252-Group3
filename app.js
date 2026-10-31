@@ -16,17 +16,6 @@ function daysSincePurchase(purchaseDateValue) {
   return Math.round((today - purchaseDate) / msPerDay);
 }
 
-function isWithinReturnWindow(purchaseDateValue) {
-  if (!purchaseDateValue) return true; // nothing entered yet, don't block on an empty field
-  return daysSincePurchase(purchaseDateValue) <= RETURN_WINDOW_DAYS;
-}
-
-// BR-2: final-sale/clearance items are not eligible for return
-function isFinalSaleReturnable(finalSale) {
-  if (!finalSale) return true; // nothing selected yet, don't block on an empty field
-  return finalSale !== "Yes";
-}
-
 // BR-3: return quantity can't exceed what was originally purchased
 function isQuantityValid(quantity, originalQuantity) {
   return quantity >= 1 && quantity <= originalQuantity;
@@ -46,8 +35,10 @@ const quantityMessage = document.getElementById("quantityMessage");
 const itemTotalInput = document.getElementById("itemTotal");
 const reasonCodeSelect = document.getElementById("reasonCode");
 
-const finalSaleSelect = document.getElementById("finalSale");
-const finalSaleMessage = document.getElementById("finalSaleMessage");
+const customerIdInput = document.getElementById("customerId");
+const orderNumberInput = document.getElementById("orderNumber");
+const skuInput = document.getElementById("sku");
+const returnMethodSelect = document.getElementById("returnMethod");
 
 const form = document.querySelector("form");
 const formMessage = document.getElementById("formMessage");
@@ -162,77 +153,37 @@ function updateQuantityMessage() {
   }
 }
 
-function updateFinalSaleMessage() {
-  const value = finalSaleSelect.value;
-
-  if (!value) {
-    setMessage(finalSaleMessage, "");
-    finalSaleSelect.removeAttribute("aria-invalid");
-    return;
-  }
-
-  if (!isFinalSaleReturnable(value)) {
-    setMessage(finalSaleMessage, "Final-sale and clearance items cannot be returned (BR-2).", "blocked");
-  } else {
-    setMessage(finalSaleMessage, "");
-    finalSaleSelect.removeAttribute("aria-invalid");
-  }
-}
-
 preferredResolutionSelect.addEventListener("change", updateReplacementSkuState);
 replacementSkuInput.addEventListener("input", updateReplacementSkuState);
 purchaseDateInput.addEventListener("input", updatePurchaseDateMessage);
 originalQuantityInput.addEventListener("input", updateQuantityMessage);
 quantityInput.addEventListener("input", updateQuantityMessage);
-finalSaleSelect.addEventListener("change", updateFinalSaleMessage);
 
-// submit-time gate (Week 7): re-check both rules before letting the browser path continue
+// Submit handler. The browser's built-in checks (required fields, min=1) still run first.
+// All business rules and input validation are enforced by the Lambda backend, so every
+// submission is sent to the API and the result panel shows the backend's response.
+// The inline hints above (days left, quantity, replacement SKU) are live feedback only.
 async function handleSubmit(event) {
   event.preventDefault();
 
-  if (isReplacementSkuRequired(preferredResolutionSelect.value) && replacementSkuInput.value.trim() === "") {
-    setResultPanel("rejected", "Can't submit yet", "Enter a Replacement SKU before submitting, or change your Preferred Resolution.");
-    // Give invalid fields a visible error outline that doesn't depend on
-    // :focus-visible's mouse-vs-keyboard heuristic (A13, accessibility review).
-    replacementSkuInput.setAttribute("aria-invalid", "true");
-    replacementSkuInput.focus();
-    return;
-  }
-
-  if (!isWithinReturnWindow(purchaseDateInput.value)) {
-    setResultPanel("rejected", "Can't submit yet", "This return is outside the 30-day window and cannot be submitted (BR-1).");
-    purchaseDateInput.setAttribute("aria-invalid", "true");
-    purchaseDateInput.focus();
-    return;
-  }
-
-  if (!isFinalSaleReturnable(finalSaleSelect.value)) {
-    setResultPanel("rejected", "Can't submit yet", "Final-sale and clearance items are not eligible for return (BR-2).");
-    finalSaleSelect.setAttribute("aria-invalid", "true");
-    finalSaleSelect.focus();
-    return;
-  }
-
   const quantity = Number(quantityInput.value);
   const originalQuantity = Number(originalQuantityInput.value);
-
-  if (!isQuantityValid(quantity, originalQuantity)) {
-    setResultPanel("rejected", "Can't submit yet", "Quantity to return cannot exceed the original quantity purchased (BR-3).");
-    quantityInput.setAttribute("aria-invalid", "true");
-    quantityInput.focus();
-    return;
-  }
 
   setSubmitting(true);
   setResultPanel("loading", "Submitting your request…", "");
 
   const requestBody = {
+    customerId: customerIdInput.value.trim(),
+    orderNumber: orderNumberInput.value.trim(),
+    sku: skuInput.value.trim(),
     purchaseDate: purchaseDateInput.value,
     quantity: quantity,
     originalQuantity: originalQuantity,
-    reasonCode: reasonCodeSelect.value,
     itemTotal: Number(itemTotalInput.value),
-    finalSale: finalSaleSelect.value
+    reasonCode: reasonCodeSelect.value,
+    preferredResolution: preferredResolutionSelect.value,
+    returnMethod: returnMethodSelect.value,
+    replacementSku: replacementSkuInput.value.trim()
   };
 
   try {
@@ -248,7 +199,7 @@ async function handleSubmit(event) {
     } else if (result.needsSupervisor) {
       setResultPanel("supervisor", "Approved — pending supervisor review", result.message);
     } else {
-      setResultPanel("approved", "Approved", "");
+      setResultPanel("approved", "Approved", result.message);
     }
   } catch (error) {
     setResultPanel("rejected", "Couldn't reach the server", "Check your connection and try again.");

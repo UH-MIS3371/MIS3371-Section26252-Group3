@@ -26,3 +26,19 @@ docs/
 - [Three-Tier Architecture & Responsibilities](docs/03-system-design/architecture-v1.pptx)
 - [Data Dictionary](docs/03-system-design/data-dictionary.md)
 
+## Deployment (AWS)
+The Product Return Request system is deployed on AWS (Learner Lab, region `us-east-1`).
+
+| Item | Link |
+|---|---|
+| Frontend (AWS Amplify) | https://staging.d1sg7ta5nv9m14.amplifyapp.com |
+| API Gateway invoke URL | https://iqpj8rd7ff.execute-api.us-east-1.amazonaws.com |
+| API route | `POST /api/returns` |
+| Test cases (valid, invalid, business-rule, boundary) | [aws-deployment-test-cases.pdf](docs/05-deployment/aws-deployment-test-cases.pdf) |
+| Deployment evidence | [aws-deployment-evidence.md](docs/05-deployment/aws-deployment-evidence.md) |
+
+Flow: Browser (Amplify) -> API Gateway (HTTP API) -> Lambda `MIS3371-ReturnRequest` (`index.js`) -> `backend/returnRules.js`.
+All input validation and business rules run in Lambda.
+
+To verify, open the frontend URL and enter the values from the test-case PDF.
+The backend tests can also be run locally from the `backend` folder with `node returnRules.test.js`.

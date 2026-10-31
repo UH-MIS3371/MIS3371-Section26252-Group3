@@ -5,5 +5,5 @@
       "method": "POST"
     }
   },
-  "body": "{\"purchaseDate\":\"2026-09-16\",\"quantity\":1,\"originalQuantity\":1,\"reasonCode\":\"Wrong Item\",\"itemTotal\":40}"
+  "body": "{\"customerId\":\"C-1001\",\"orderNumber\":\"ORD-5001\",\"sku\":\"SKU-1001\",\"originalQuantity\":1,\"quantity\":1,\"itemTotal\":40,\"reasonCode\":\"Wrong Item\",\"preferredResolution\":\"Refund\",\"returnMethod\":\"Mail\",\"replacementSku\":\"\",\"purchaseDate\":\"2026-09-16\"}"
 }
