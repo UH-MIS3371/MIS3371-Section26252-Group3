@@ -96,9 +96,22 @@
             <p class="field-message" id="purchaseDateMessage" aria-live="polite"></p>
           </div>
 
-          <div class="field">
-            <label for="itemTotal">Item Value ($)</label>
-            <input id="itemTotal" name="itemTotal" type="number" min="0" step="0.01" required>
+          <div class="field-row">
+            <div class="field">
+              <label for="itemTotal">Item Price ($)</label>
+              <input id="itemTotal" name="itemTotal" type="number" min="0.01" step="0.01" required aria-describedby="itemTotalMessage">
+              <p class="field-message" id="itemTotalMessage" aria-live="polite"></p>
+            </div>
+
+            <div class="field">
+              <label for="finalSale">Was this a Final Sale or Clearance item?</label>
+              <select id="finalSale" name="finalSale" required aria-describedby="finalSaleMessage">
+                <option value="">-- Select an option --</option>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+              <p class="field-message" id="finalSaleMessage" aria-live="polite"></p>
+            </div>
           </div>
         </fieldset>
 
