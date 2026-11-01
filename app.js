@@ -28,6 +28,9 @@ const replacementSkuMessage = document.getElementById("replacementSkuMessage");
 const purchaseDateInput = document.getElementById("purchaseDate");
 const purchaseDateMessage = document.getElementById("purchaseDateMessage");
 
+// Block future dates
+purchaseDateInput.max = new Date().toISOString().split("T")[0];
+
 const originalQuantityInput = document.getElementById("originalQuantity");
 const quantityInput = document.getElementById("quantity");
 const quantityMessage = document.getElementById("quantityMessage");
@@ -110,18 +113,26 @@ function updatePurchaseDateMessage() {
 
   if (!value) {
     setMessage(purchaseDateMessage, "");
+    purchaseDateInput.removeAttribute("aria-invalid");
     return;
   }
 
   const elapsed = daysSincePurchase(value);
 
-  if (elapsed > RETURN_WINDOW_DAYS) {
+  // New check to block future dates
+  if (elapsed < 0) {
+    setMessage(purchaseDateMessage, "Purchase date cannot be in the future.", "blocked");
+    purchaseDateInput.setAttribute("aria-invalid", "true");
+  } 
+  else if (elapsed > RETURN_WINDOW_DAYS) {
     setMessage(
       purchaseDateMessage,
       "This item was delivered " + elapsed + " days ago, which is outside the 30-day return window (BR-1).",
       "blocked"
     );
-  } else {
+    purchaseDateInput.setAttribute("aria-invalid", "true");
+  } 
+  else {
     const daysLeft = RETURN_WINDOW_DAYS - elapsed;
     setMessage(
       purchaseDateMessage,
