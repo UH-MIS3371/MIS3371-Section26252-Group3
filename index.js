@@ -29,8 +29,7 @@ exports.handler = async (event = {}) => {
     return reply(400, { approved: false, message: "Request body must be valid JSON." });
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date());
   const result = processReturnRequest(request, today);
-
   return reply(result.approved ? 200 : 400, result);
 };
