@@ -29,7 +29,7 @@ const purchaseDateInput = document.getElementById("purchaseDate");
 const purchaseDateMessage = document.getElementById("purchaseDateMessage");
 
 // Block future dates
-purchaseDateInput.max = new Date().toISOString().split("T")[0];
+purchaseDateInput.max = new Date().toLocaleDateString("en-CA");
 
 const originalQuantityInput = document.getElementById("originalQuantity");
 const quantityInput = document.getElementById("quantity");
