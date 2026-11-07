@@ -47,6 +47,24 @@ result to an API Gateway response. All business rules remain in
   predefined test cases (valid, invalid, business-rule, and boundary cases,
   plus API-level validation cases) and their expected outcomes.
 
+## Redeployment (2026-11-07)
+
+Several teammate commits (timezone fix, state-model fix, BR-2 input
+validation, expanded tests) had been merged to `main` over the prior
+week but never actually pushed to the live Lambda/Amplify — each
+required a manual zip upload in the console, which hadn't happened.
+Rebuilt both deployment packages from current `main` and redeployed:
+
+- Lambda `MIS3371-ReturnRequest`: updated from a .zip file containing
+  `index.js` + `backend/returnRules.js`.
+- Amplify `MIS3371-ProductReturn` (branch `staging`): deployed updates
+  from a .zip file containing `index.html` + `styles.css` + `app.js`.
+
+Re-verified via `curl` against the live API Gateway endpoint (BR-2
+final-sale/no case, future-date rejection, today's-date approval) and
+a full live form submission on the deployed Amplify URL, confirming
+the frontend's result panel reflects the backend's actual response.
+
 ## AWS Academy Learner Lab notes
 
 - Account is a locked-down student sandbox (`voclabs` federated role),
