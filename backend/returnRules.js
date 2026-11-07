@@ -16,14 +16,7 @@ var SUPERVISOR_APPROVAL_LIMIT = 200;
 var REASON_CODES = ["Defective", "Wrong Item", "No Longer Needed", "Other"];
 var RESOLUTIONS = ["Refund", "Replacement"];
 var RETURN_METHODS = ["Mail", "In-Store Drop-off"];
-
-// BR-2: SKUs flagged as final-sale or clearance (stand-in for a product catalog lookup).
-var NON_RETURNABLE_SKUS = {
-  "FS-1001": "final-sale",
-  "FS-1002": "final-sale",
-  "CLR-2001": "clearance",
-  "CLR-2002": "clearance"
-};
+var FINAL_SALE_VALUES = ["Yes", "No"];
 
 // Dates are strings like "2026-10-18"
 function daysSincePurchase(purchaseDate, today) {
@@ -91,6 +84,9 @@ function validateReturnRequest(request, today) {
   if (RETURN_METHODS.indexOf(request.returnMethod) === -1) {
     return "Return method must be Mail or In-Store Drop-off.";
   }
+  if (FINAL_SALE_VALUES.indexOf(request.finalSale) === -1) {
+    return "Final sale / clearance must be Yes or No.";
+  }
   if (request.preferredResolution === "Replacement" && !isNonEmptyString(request.replacementSku)) {
     return "Replacement SKU is required when requesting a replacement.";
   }
@@ -103,11 +99,10 @@ function isWithinReturnWindow(purchaseDate, today) {
   return daysSincePurchase(purchaseDate, today) <= RETURN_WINDOW_DAYS;
 }
 
-// BR-2: Final-sale and clearance items are not eligible for return.
-// Returns "final-sale", "clearance", or "" if the SKU can be returned.
-function getNonReturnableType(sku) {
-  var key = String(sku).trim().toUpperCase();
-  return NON_RETURNABLE_SKUS[key] || "";
+// BR-2: Items flagged as "final-sale" or "clearance" are not eligible for return.
+// Returns true if the item can be returned, false if it's final-sale.
+function isFinalSaleReturnable(finalSale) {
+  return finalSale !== "Yes";
 }
 
 // BR-3: Quantity to return must be at least 1 and cannot be
@@ -142,10 +137,8 @@ function processReturnRequest(request, today) {
     return rejected("Return request is outside the 30-day return window.");
   }
 
-  var nonReturnableType = getNonReturnableType(request.sku);
-  if (nonReturnableType) {
-    return rejected("Item " + request.sku.trim().toUpperCase() + " is " + nonReturnableType +
-      " and is not eligible for return.");
+  if (!isFinalSaleReturnable(request.finalSale)) {
+    return rejected("Final-sale and clearance items are not eligible for return.");
   }
 
   if (!isQuantityValid(request.quantity, request.originalQuantity)) {
@@ -167,7 +160,7 @@ function processReturnRequest(request, today) {
 module.exports = {
   validateReturnRequest: validateReturnRequest,
   isWithinReturnWindow: isWithinReturnWindow,
-  getNonReturnableType: getNonReturnableType,
+  isFinalSaleReturnable: isFinalSaleReturnable,
   isQuantityValid: isQuantityValid,
   needsSupervisorApproval: needsSupervisorApproval,
   processReturnRequest: processReturnRequest

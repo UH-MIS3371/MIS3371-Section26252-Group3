@@ -19,6 +19,7 @@ function makeRequest(changes) {
     reasonCode: "No Longer Needed",
     preferredResolution: "Refund",
     returnMethod: "Mail",
+    finalSale: "No",
     replacementSku: ""
   };
   for (var key in changes) {
@@ -58,16 +59,16 @@ var tests = [
     expectedApproved: false, expectedSupervisor: false, expectedMessage: "outside the 30-day return window"
   },
   {
-    name: "Test 5 - Invalid (BR-2): final-sale SKU",
+    name: "Test 5 - Invalid (BR-2): final-sale item",
     type: "Invalid",
-    request: makeRequest({ sku: "FS-1001" }),
-    expectedApproved: false, expectedSupervisor: false, expectedMessage: "final-sale and is not eligible"
+    request: makeRequest({ finalSale: "Yes" }),
+    expectedApproved: false, expectedSupervisor: false, expectedMessage: "Final-sale and clearance items are not eligible for return."
   },
   {
-    name: "Test 6 - Invalid (BR-2): clearance SKU (lowercase input)",
+    name: "Test 6 - Invalid (BR-2): final-sale item, different reason code",
     type: "Invalid",
-    request: makeRequest({ sku: "clr-2002" }),
-    expectedApproved: false, expectedSupervisor: false, expectedMessage: "clearance and is not eligible"
+    request: makeRequest({ finalSale: "Yes", reasonCode: "Defective", itemTotal: 15 }),
+    expectedApproved: false, expectedSupervisor: false, expectedMessage: "Final-sale and clearance items are not eligible for return."
   },
   {
     name: "Test 7 - Invalid (BR-3): returning more than was purchased",

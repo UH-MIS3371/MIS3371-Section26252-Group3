@@ -5,5 +5,5 @@
       "method": "POST"
     }
   },
-  "body": "{\"customerId\":\"C-1001\",\"orderNumber\":\"ORD-5001\",\"sku\":\"SKU-1001\",\"originalQuantity\":1,\"quantity\":1,\"itemTotal\":40,\"reasonCode\":\"Wrong Item\",\"preferredResolution\":\"Refund\",\"returnMethod\":\"Mail\",\"replacementSku\":\"\",\"purchaseDate\":\"2026-09-16\"}"
+  "body": "{\"customerId\":\"C-1001\",\"orderNumber\":\"ORD-5001\",\"sku\":\"SKU-1001\",\"originalQuantity\":1,\"quantity\":1,\"itemTotal\":40,\"reasonCode\":\"Wrong Item\",\"preferredResolution\":\"Refund\",\"returnMethod\":\"Mail\",\"finalSale\":\"No\",\"replacementSku\":\"\",\"purchaseDate\":\"2026-09-16\"}"
 }

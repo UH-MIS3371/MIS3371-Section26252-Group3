@@ -37,6 +37,8 @@ const quantityMessage = document.getElementById("quantityMessage");
 
 const itemTotalInput = document.getElementById("itemTotal");
 const reasonCodeSelect = document.getElementById("reasonCode");
+const finalSaleSelect = document.getElementById("finalSale");
+const finalSaleMessage = document.getElementById("finalSaleMessage");
 
 const customerIdInput = document.getElementById("customerId");
 const orderNumberInput = document.getElementById("orderNumber");
@@ -164,11 +166,30 @@ function updateQuantityMessage() {
   }
 }
 
+function updateFinalSaleMessage() {
+  const value = finalSaleSelect.value;
+
+  if (!value) {
+    setMessage(finalSaleMessage, "");
+    finalSaleSelect.removeAttribute("aria-invalid");
+    return;
+  }
+
+  if (value === "Yes") {
+    setMessage(finalSaleMessage, "Final-sale and clearance items are not eligible for return (BR-2).", "blocked");
+    finalSaleSelect.setAttribute("aria-invalid", "true");
+  } else {
+    setMessage(finalSaleMessage, "Eligible for return.", "ok");
+    finalSaleSelect.removeAttribute("aria-invalid");
+  }
+}
+
 preferredResolutionSelect.addEventListener("change", updateReplacementSkuState);
 replacementSkuInput.addEventListener("input", updateReplacementSkuState);
 purchaseDateInput.addEventListener("input", updatePurchaseDateMessage);
 originalQuantityInput.addEventListener("input", updateQuantityMessage);
 quantityInput.addEventListener("input", updateQuantityMessage);
+finalSaleSelect.addEventListener("change", updateFinalSaleMessage);
 
 // Submit handler. The browser's built-in checks (required fields, min=1) still run first.
 // All business rules and input validation are enforced by the Lambda backend, so every
@@ -194,6 +215,7 @@ async function handleSubmit(event) {
     reasonCode: reasonCodeSelect.value,
     preferredResolution: preferredResolutionSelect.value,
     returnMethod: returnMethodSelect.value,
+    finalSale: finalSaleSelect.value,
     replacementSku: replacementSkuInput.value.trim()
   };
 
