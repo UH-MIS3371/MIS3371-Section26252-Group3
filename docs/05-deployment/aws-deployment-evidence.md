@@ -7,7 +7,7 @@
 
 - **Frontend (AWS Amplify):** https://staging.d1sg7ta5nv9m14.amplifyapp.com
 - **API Gateway invoke URL:** https://iqpj8rd7ff.execute-api.us-east-1.amazonaws.com
-- **API route:** `POST /api/returns`
+- **API routes:** `POST /api/returns`, `GET /api/returns/{returnId}`
 
 ## Resources created
 
@@ -16,6 +16,7 @@
 | AWS Lambda | `MIS3371-ReturnRequest` | Node.js, execution role `LabRole`, code = `index.js` + `backend/` |
 | API Gateway | `MIS3371-ReturnRequest-API` | HTTP API, payload format 2.0, CORS enabled (`*` origin, `content-type` header, `POST`/`OPTIONS`) |
 | AWS Amplify | `MIS3371-ProductReturn` | Manual ZIP deploy (no Git provider) of `index.html` (copy of `transaction-form.html`), `styles.css`, `app.js` |
+| Amazon DynamoDB | `MIS3371-Returns` | On-demand capacity, partition key `returnId` (String); stores every submitted return and its outcome |
 
 ## Architecture
 
@@ -64,6 +65,42 @@ Re-verified via `curl` against the live API Gateway endpoint (BR-2
 final-sale/no case, future-date rejection, today's-date approval) and
 a full live form submission on the deployed Amplify URL, confirming
 the frontend's result panel reflects the backend's actual response.
+
+## Milestone 4: DynamoDB persistence (2026-11-15)
+
+Implements FR-4 (unique return ID + initial status) and FR-5 (show the
+customer the current status of their return) from
+`docs/02-requirements/functional-requirements.md`, and the `return_id`/
+`status` fields documented in the Week 3 data dictionary since the
+start of the project.
+
+- Created DynamoDB table `MIS3371-Returns` (on-demand capacity,
+  partition key `returnId`).
+- Updated `index.js`: every `POST /api/returns` now generates a return
+  ID (`RTN-<year>-<5 digits>`), saves the full request plus outcome to
+  the table, and returns the ID to the caller. Status is mapped onto
+  the documented state model (Approved / Pending Supervisor Review /
+  Rejected). `backend/returnRules.js` is unchanged — all business
+  rules still live there.
+- Added route `GET /api/returns/{returnId}` on the existing API
+  Gateway API, reusing the same Lambda integration as the POST route.
+- Updated `app.js`/`transaction-form.html`: the result panel shows the
+  confirmation number, and a new "Check a Return Status" section looks
+  up a return by that number.
+
+**Verification:**
+- Lambda console test (POST): succeeded, persisted a record, and
+  returned a `returnId`.
+- Lambda console test (GET, using that `returnId`): retrieved the
+  full stored record.
+- `curl` POST against the live API Gateway endpoint, then `curl` GET
+  with the returned `returnId`: round-tripped correctly, including a
+  GET for a nonexistent ID correctly returning "not found."
+- Live browser submission on the deployed Amplify URL, followed by a
+  lookup using the confirmation number shown in the result panel:
+  returned the correct stored status.
+- Confirmed all three test records directly in the DynamoDB item
+  explorer in the console.
 
 ## AWS Academy Learner Lab notes
 
