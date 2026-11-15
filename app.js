@@ -2,7 +2,11 @@
 const RETURN_WINDOW_DAYS = 30;
 
 // Week 10: HTTP API created in API Gateway, routed to the MIS3371-ReturnRequest Lambda.
-const API_URL = "https://iqpj8rd7ff.execute-api.us-east-1.amazonaws.com/api/returns";
+// When this page is served locally (Milestone 3's Express server), talk to that
+// server instead of the deployed AWS API.
+const API_URL = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+  ? "http://" + location.host + "/api/returns"
+  : "https://iqpj8rd7ff.execute-api.us-east-1.amazonaws.com/api/returns";
 
 function isReplacementSkuRequired(preferredResolution) {
   return preferredResolution === "Replacement";

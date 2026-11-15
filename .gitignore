@@ -3,3 +3,4 @@
 .superpowers/
 lambda-deploy.zip
 amplify-deploy.zip
+node_modules/

@@ -1,0 +1,12 @@
+{
+  "name": "mis3371-product-return-local-server",
+  "version": "1.0.0",
+  "description": "Local Express server connecting the Product Return Request frontend and backend (Milestone 3 - no AWS or database required).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
