@@ -45,7 +45,7 @@ const orderNumberInput = document.getElementById("orderNumber");
 const skuInput = document.getElementById("sku");
 const returnMethodSelect = document.getElementById("returnMethod");
 
-const form = document.querySelector("form");
+const form = document.getElementById("returnForm");
 const formMessage = document.getElementById("formMessage");
 const resultIcon = document.getElementById("resultIcon");
 const resultHeading = document.getElementById("resultHeading");
@@ -54,6 +54,21 @@ const resultDetail = document.getElementById("resultDetail");
 const submitButton = document.getElementById("submitButton");
 const submitButtonLabel = document.getElementById("submitButtonLabel");
 const submitSpinner = document.getElementById("submitSpinner");
+
+const lookupForm = document.getElementById("lookupForm");
+const lookupReturnIdInput = document.getElementById("lookupReturnId");
+const lookupMessage = document.getElementById("lookupMessage");
+const lookupResultIcon = document.getElementById("lookupResultIcon");
+const lookupResultHeading = document.getElementById("lookupResultHeading");
+const lookupResultDetail = document.getElementById("lookupResultDetail");
+const lookupButton = document.getElementById("lookupButton");
+const lookupButtonLabel = document.getElementById("lookupButtonLabel");
+const lookupSpinner = document.getElementById("lookupSpinner");
+
+const returnPanelRefs = { panel: formMessage, icon: resultIcon, heading: resultHeading, detail: resultDetail };
+const lookupPanelRefs = { panel: lookupMessage, icon: lookupResultIcon, heading: lookupResultHeading, detail: lookupResultDetail };
+const submitButtonRefs = { button: submitButton, label: submitButtonLabel, spinner: submitSpinner, idleLabel: "Submit Return Request", busyLabel: "Submitting…" };
+const lookupButtonRefs = { button: lookupButton, label: lookupButtonLabel, spinner: lookupSpinner, idleLabel: "Look Up Return", busyLabel: "Looking up…" };
 
 function setMessage(element, text, state) {
   element.textContent = text;
@@ -71,24 +86,32 @@ const RESULT_ICONS = {
   loading: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.3"/><path d="M21 12a9 9 0 0 0-9-9"/></svg>'
 };
 
-// Single entry point for the post-submit result panel. state is one of
-// RESULT_ICONS' keys, or null to hide the panel entirely.
-function setResultPanel(state, heading, detail) {
+// Single entry point for a result panel (the main form's or the lookup form's).
+// state is one of RESULT_ICONS' keys, or null to hide the panel entirely.
+function setResultPanel(refs, state, heading, detail) {
   if (!state) {
-    formMessage.hidden = true;
+    refs.panel.hidden = true;
     return;
   }
-  formMessage.hidden = false;
-  formMessage.className = "result-panel result-panel--" + state;
-  resultIcon.innerHTML = RESULT_ICONS[state];
-  resultHeading.textContent = heading;
-  resultDetail.textContent = detail || "";
+  refs.panel.hidden = false;
+  refs.panel.className = "result-panel result-panel--" + state;
+  refs.icon.innerHTML = RESULT_ICONS[state];
+  refs.heading.textContent = heading;
+  refs.detail.textContent = detail || "";
 }
 
-function setSubmitting(isSubmitting) {
-  submitButton.disabled = isSubmitting;
-  submitButtonLabel.textContent = isSubmitting ? "Submitting…" : "Submit Return Request";
-  submitSpinner.hidden = !isSubmitting;
+function setButtonBusy(refs, isBusy) {
+  refs.button.disabled = isBusy;
+  refs.label.textContent = isBusy ? refs.busyLabel : refs.idleLabel;
+  refs.spinner.hidden = !isBusy;
+}
+
+// A looked-up return's status maps onto the same green/orange/red states as a
+// fresh submission (docs/03-system-design/state-model-v1.pptx).
+function resultStateForStatus(status) {
+  if (status === "Rejected") return "rejected";
+  if (status === "Pending Supervisor Review") return "supervisor";
+  return "approved";
 }
 
 // live feedback while the user edits the form (Week 6)
@@ -201,8 +224,8 @@ async function handleSubmit(event) {
   const quantity = Number(quantityInput.value);
   const originalQuantity = Number(originalQuantityInput.value);
 
-  setSubmitting(true);
-  setResultPanel("loading", "Submitting your request…", "");
+  setButtonBusy(submitButtonRefs, true);
+  setResultPanel(returnPanelRefs, "loading", "Submitting your request…", "");
 
   const requestBody = {
     customerId: customerIdInput.value.trim(),
@@ -226,19 +249,52 @@ async function handleSubmit(event) {
       body: JSON.stringify(requestBody)
     });
     const result = await response.json();
+    const detail = result.message + " Confirmation number: " + result.returnId + ".";
 
     if (!result.approved) {
-      setResultPanel("rejected", "Not approved", result.message);
+      setResultPanel(returnPanelRefs, "rejected", "Not approved", detail);
     } else if (result.needsSupervisor) {
-      setResultPanel("supervisor", "Approved — pending supervisor review", result.message);
+      setResultPanel(returnPanelRefs, "supervisor", "Approved — pending supervisor review", detail);
     } else {
-      setResultPanel("approved", "Approved", result.message);
+      setResultPanel(returnPanelRefs, "approved", "Approved", detail);
     }
   } catch (error) {
-    setResultPanel("rejected", "Couldn't reach the server", "Check your connection and try again.");
+    setResultPanel(returnPanelRefs, "rejected", "Couldn't reach the server", "Check your connection and try again.");
   } finally {
-    setSubmitting(false);
+    setButtonBusy(submitButtonRefs, false);
   }
 }
 
 form.addEventListener("submit", handleSubmit);
+
+// FR-5: look up a previously submitted return by its confirmation number.
+async function handleLookup(event) {
+  event.preventDefault();
+
+  const returnId = lookupReturnIdInput.value.trim();
+
+  setButtonBusy(lookupButtonRefs, true);
+  setResultPanel(lookupPanelRefs, "loading", "Looking up your return…", "");
+
+  try {
+    const response = await fetch(API_URL + "/" + encodeURIComponent(returnId));
+    const result = await response.json();
+
+    if (!result.found) {
+      setResultPanel(lookupPanelRefs, "rejected", "Not found", result.message);
+    } else {
+      setResultPanel(
+        lookupPanelRefs,
+        resultStateForStatus(result.status),
+        "Status: " + result.status,
+        result.message + " (Submitted " + result.submittedAt + ")"
+      );
+    }
+  } catch (error) {
+    setResultPanel(lookupPanelRefs, "rejected", "Couldn't reach the server", "Check your connection and try again.");
+  } finally {
+    setButtonBusy(lookupButtonRefs, false);
+  }
+}
+
+lookupForm.addEventListener("submit", handleLookup);

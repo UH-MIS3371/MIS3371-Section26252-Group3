@@ -37,7 +37,7 @@
     <section>
       <h2>Return Submission Form</h2>
 
-      <form method="post">
+      <form method="post" id="returnForm">
         <fieldset class="form-section">
           <legend class="section-legend">
             <span class="section-icon">
@@ -177,6 +177,34 @@
         <button type="submit" id="submitButton">
           <span id="submitButtonLabel">Submit Return Request</span>
           <span class="button-spinner" id="submitSpinner" aria-hidden="true" hidden></span>
+        </button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Check a Return Status</h2>
+      <p>
+        Already submitted a request? Enter the confirmation number you were
+        given to see its current status.
+      </p>
+
+      <form id="lookupForm">
+        <div class="field">
+          <label for="lookupReturnId">Confirmation Number</label>
+          <input id="lookupReturnId" name="lookupReturnId" type="text" placeholder="RTN-2026-04821" required>
+        </div>
+
+        <div class="result-panel" id="lookupMessage" aria-live="polite" hidden>
+          <span class="result-icon" id="lookupResultIcon"></span>
+          <div>
+            <p class="result-heading" id="lookupResultHeading"></p>
+            <p class="result-detail" id="lookupResultDetail"></p>
+          </div>
+        </div>
+
+        <button type="submit" id="lookupButton">
+          <span id="lookupButtonLabel">Look Up Return</span>
+          <span class="button-spinner" id="lookupSpinner" aria-hidden="true" hidden></span>
         </button>
       </form>
     </section>
