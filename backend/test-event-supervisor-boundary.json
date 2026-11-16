@@ -1,0 +1,10 @@
+
+{
+  "version": "2.0",
+  "requestContext": {
+    "http": {
+      "method": "POST"
+    }
+  },
+  "body": "{\"customerId\":\"C-1002\",\"orderNumber\":\"ORD-5002\",\"sku\":\"SKU-1002\",\"originalQuantity\":2,\"quantity\":1,\"itemTotal\":200.01,\"reasonCode\":\"Defective\",\"preferredResolution\":\"Refund\",\"returnMethod\":\"Mail\",\"finalSale\":\"No\",\"replacementSku\":\"\",\"purchaseDate\":\"2026-11-01\"}"
+}
